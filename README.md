@@ -37,5 +37,7 @@ Once you've set up and built the project, follow these steps to run it and ensur
 Use the following command to start all services in the background:
 
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
+
+
