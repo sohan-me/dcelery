@@ -1,0 +1,77 @@
+services:
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  django:
+    container_name: django
+    build:
+      context: ./dcelery
+    volumes:
+      - ./dcelery:/dcelery
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:alpine
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_USER: noob
+      POSTGRES_PASSWORD: Noob417@
+      POSTGRES_DB: db
+      PGPORT: 5433
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5433"
+
+
+  celery:
+    container_name: celery
+    build:
+      context: ./dcelery
+    command: celery --app=dcelery worker -l INFO -Q queue1
+    volumes:
+      - ./dcelery:/dcelery
+    depends_on:
+      - redis
+    environment:
+      - TZ=Asia/Dhaka
+
+  wcelery:
+    container_name: wcelery
+    build:
+      context: ./celeryworker
+    command: celery -A celerytask worker -l INFO -Q queue2
+    volumes:
+      - ./dcelery:/dcelery
+    depends_on:
+      - redis
+      - django
+    environment:
+      - TZ=Asia/Dhaka
+
+  celery-beat:
+    container_name: celerybeat
+    build:
+      context: ./dcelery
+    command: celery --app=dcelery beat -l INFO 
+    volumes:
+      - ./dcelery:/dcelery
+      - celery-beat-schedule:/celerybeat-schedule
+    depends_on:
+      - redis
+      - django
+    environment:
+      - TZ=Asia/Dhaka
+
+volumes:
+  db_data:
+  celery-beat-schedule:
+    driver: local
