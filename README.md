@@ -32,7 +32,7 @@ cd dcelery
 
 Once you've set up and built the project, follow these steps to run it and ensure everything is working as expected.
 
-### 1. Start the Docker Containers
+### 2. Start the Docker Containers
 
 Use the following command to start all services in the background:
 
